@@ -30,7 +30,7 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent) {
     label_predire->move(200, 200);
     label_predire->setGeometry(200,210,400,25);
 
-    read_csv(m_mat,m_vet, "/home/p16005334/ecbd/build-td_projet_ecbd-Desktop-Debug/data.csv");
+    read_csv(m_mat,m_vet, "/home/p16005334/build-td_projet_ecbd-Desktop-Debug/data.csv");
 
     label_table = new QLabel ("Table d'apprentissage : ",this);
     label_table->setFont(QFont("Arial", 12, QFont::Normal, true));
@@ -71,7 +71,6 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent) {
     this->initComboBox(2,m_comToux);
 }
 
-
 void MaFenetre::initComboBox(int column,QComboBox* m_box){
     m_lab = new QLabel (m_vet[column].c_str(),this);
     m_lab->setFont(QFont("Verdana",12));
@@ -80,13 +79,9 @@ void MaFenetre::initComboBox(int column,QComboBox* m_box){
     for(unsigned i(0); i < m_mat.size();++i){
         tmp.append(m_mat[i][column].c_str());
     }
-    tmp.removeDuplicates();
+    tmp.removeDuplicates(); //On ote les doublons produits par le fichier csv
     m_box->addItems(tmp);
     m_lab->move(m_box->x()+10,m_box->y()-20);
-
-}
-void MaFenetre::setQuitter() {
-    exit(0);
 }
 
 void MaFenetre::predire() {
@@ -106,7 +101,6 @@ void MaFenetre::predire() {
     vector <float> scoresMaladies; // On init le vecteur des scores liés aux maladies.
 
     //Boucle qui calcule le score de chaque maladie récupérée juste avant (usage : param maladie avec determinerConf)
-
     for (int i = 0; i < maladies.size(); ++i){
         scoresMaladies.push_back(determinerConf(maladies.at(i).toStdString()));
     }
@@ -122,12 +116,16 @@ void MaFenetre::predire() {
     if (meilleurScore == 0){
         label_predire->setText("La maladie est impossible a predire !");
     } else {
-        label_predire->setText(m_prenom->text() + " " + m_nom->text() +" a " + maladies.at(indice) + "!");
+        if(m_prenom->text() !="" && m_nom->text() !=""){
+            label_predire->setText(m_prenom->text() + " " + m_nom->text() +" a " + maladies.at(indice) + "!");
+        } else {
+            label_predire->setText("Le patient a " + maladies.at(indice));
+        }
     }
 
 }
 
-float MaFenetre::determinerConf(string maladie){
+float MaFenetre::determinerConf(string maladie){ // Amélioration par ComboBox en paramètre qui serait utilisable
 
     float freqMaladie (0);
     float freqFievre (0);
@@ -138,7 +136,6 @@ float MaFenetre::determinerConf(string maladie){
         if(m_mat[i][3] == maladie)
             freqMaladie++;
     }
-
 
     if (m_comFievre->currentText().toStdString() != "NULL"){
         for (unsigned i = 0; i < m_mat.size(); i++){
@@ -151,14 +148,12 @@ float MaFenetre::determinerConf(string maladie){
         freqFievre = 1;
     }
 
-
     if (m_comDouleur->currentText().toStdString() != "NULL"){
         for (unsigned i = 0; i < m_mat.size(); i++){
                     if (m_mat[i][3] == maladie && m_mat[i][1] == m_comDouleur->currentText().toStdString()){
                         freqDouleur++;
                }
         }
-        cout << freqDouleur << "caca" << freqMaladie << endl;
         freqDouleur = freqDouleur/freqMaladie;
     } else {
         freqDouleur = 1;
@@ -174,14 +169,12 @@ float MaFenetre::determinerConf(string maladie){
     } else {
         freqToux = 1;
     }
-
-    cout << freqFievre << endl << freqDouleur << endl << freqToux << endl << freqMaladie << endl << m_mat.size() << endl;
-
     float scoreMaladie = freqFievre * freqDouleur * freqToux * (freqMaladie / m_mat.size());
-
     cout << "Verification du score de la maladie : " << maladie << scoreMaladie << endl;
-
     return (scoreMaladie);
+}
 
+void MaFenetre::setQuitter() {
+    exit(0);
 }
 
