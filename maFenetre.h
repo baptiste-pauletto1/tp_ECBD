@@ -22,7 +22,7 @@ public slots :
 private:
      QLabel *m_lab, *m_res, *label_prenom, *label_nom, *label_table, *label_predire;
      QPushButton *m_bou, *predict_button;
-     QComboBox *m_com1, *m_com2, *m_com3;
+     QComboBox *m_comFievre, *m_comDouleur, *m_comToux;
      QLineEdit *m_nom,*m_prenom;
      QTableWidget *m_informations;
 
@@ -32,8 +32,7 @@ private:
 public:
     MaFenetre(QWidget *parent = 0);
     void initComboBox(int i, QComboBox* m_box);
-    int determinerFreq(string maladie);
-    int determinerConf(string maladie);
+    float determinerConf(string maladie);
 };
 
 
